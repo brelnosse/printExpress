@@ -12,19 +12,20 @@ function LogoIllustration(){
 }
 const styles = StyleSheet.create({
     pictureContainer:{
-        height: 200,
-        width: 200,
+        height: 100,
+        width: 100,
         backgroundColor: 'transparent',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-
+        marginHorizontal: 'auto',
+        marginVertical: 20,
     },
     image :{
-        height: 200,
-        width: 200,
+        height: 100,
+        width: 100,
         borderRadius: 20,
-        boxShadow: '0px 0px 16px 16px rgba(0,0,0,0.03s)'
+        boxShadow: '0px 0px 16px 16px rgba(0,0,0,0.03)'
     }
 })
 export default LogoIllustration;

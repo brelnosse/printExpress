@@ -1,39 +1,21 @@
 import { useState } from 'react';
 import {
-  ActivityIndicator,
-  Image, // Ajouté pour l'indicateur de chargement
-  KeyboardAvoidingView, // Ajouté pour une meilleure gestion du clavier
-  Platform // Ajouté pour la compatibilité
-  ,
-
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Image, // Ajouté pour l'indicateur de chargement
+    KeyboardAvoidingView, // Ajouté pour une meilleure gestion du clavier
+    Platform, // Ajouté pour la compatibilité
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LogoIllustration from '../components/LogoIlustration';
-
-// --- Bonnes pratiques : Créer des constantes pour les couleurs et les polices ---
-const COLORS = {
-    primary: '#f40899',
-    white: '#fff',
-    black: '#000',
-    grey: '#888',
-    lightGrey: '#eee',
-    googleBlue: '#0671eb',
-    error: '#ff3333'
-};
-
-const FONTS = {
-    regular: 'poppins-regular',
-    bold: 'poppins-bold'
-};
-
+import COLORS from '../constants/Colors';
+import FONTS from '../constants/Fonts';
 
 function LoginScreen() {
-    // --- Amélioration : Utiliser un seul objet pour les données du formulaire ---
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -42,7 +24,6 @@ function LoginScreen() {
     const [error, setError] = useState(null);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    // --- Amélioration : Fonction pour gérer les changements de texte ---
     const handleInputChange = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
         if (error) setError(null); // Réinitialiser l'erreur lors de la saisie
@@ -60,8 +41,21 @@ function LoginScreen() {
 
         // Simuler un appel API
         setTimeout(() => {
-            console.log("Données de connexion:", formData);
-            // Ici, vous mettriez votre logique de connexion (ex: appel à une API)
+            // createUserWithEmailAndPassword(getAuth(), 'jane.doe@example.com', 'SuperSecretPassword!')
+            // .then(() => {
+            //     console.log('User account created & signed in!');
+            // })
+            // .catch(error => {
+            //     if (error.code === 'auth/email-already-in-use') {
+            //     console.log('That email address is already in use!');
+            //     }
+
+            //     if (error.code === 'auth/invalid-email') {
+            //     console.log('That email address is invalid!');
+            //     }
+
+            //     console.error(error);
+            // });
             // Si la connexion échoue:
             // setError("Email ou mot de passe incorrect.");
             setIsLoading(false);
@@ -80,9 +74,8 @@ function LoginScreen() {
                 {error && <Text style={styles.errorText}>{error}</Text>}
 
                 <View style={styles.form}>
-                    {/* Champ Email/Nom d'utilisateur */}
                     <View style={styles.formGroup}>
-                        <Text style={styles.label}>Nom d'utilisateur ou E-mail</Text>
+                        <Text style={styles.label}>Nom d&apos; utilisateur ou E-mail</Text>
                         <TextInput 
                             style={styles.input}
                             placeholder="Entrez votre nom d'utilisateur ou e-mail"
@@ -94,7 +87,6 @@ function LoginScreen() {
                         />
                     </View>
 
-                    {/* Champ Mot de passe */}
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Mot de passe</Text>
                         <View style={styles.passwordContainer}>
@@ -120,14 +112,12 @@ function LoginScreen() {
                         )}
                     </TouchableOpacity>
 
-                    {/* Séparateur */}
                     <View style={styles.separatorContainer}>
                         <View style={styles.line} />
                         <Text style={styles.separatorText}>ou</Text>
                         <View style={styles.line} />
                     </View>
 
-                    {/* Connexion Sociale */}
                     <TouchableOpacity style={styles.googleButton}>
                         <Image source={require('../assets/images/logo-google.png')} style={styles.googleIcon} />
                         <Text style={styles.googleButtonText}>Continuer avec Google</Text>
@@ -138,10 +128,10 @@ function LoginScreen() {
     );
 }
 
-// --- Amélioration : Styles mieux organisés et plus propres ---
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
         backgroundColor: COLORS.white,
     },
     innerContainer: {
@@ -154,37 +144,43 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.bold,
         color: COLORS.primary,
         marginBottom: 20,
+        textAlign: 'center',
     },
     form: {
         width: '100%',
     },
     formGroup: {
-        marginBottom: 15,
+        // marginBottom: 15,
     },
     label: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: FONTS.regular,
         color: COLORS.primary,
-        marginBottom: 8,
+        marginVertical: 10,
     },
     input: {
         height: 50,
         paddingHorizontal: 15,
-        borderColor: COLORS.primary,
+        borderColor: 'transparent',
         borderWidth: 1,
         borderRadius: 8,
         fontSize: 15,
         fontFamily: FONTS.regular,
-        backgroundColor: COLORS.white,
+        paddingLeft: 20,
+        backgroundColor: '#f2f2f2', // Couleur de fond pour l'input
+
     },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderColor: COLORS.primary,
+        borderColor: 'transparent',
         borderWidth: 1,
         borderRadius: 8,
         height: 50,
+        paddingLeft: 20,
         paddingHorizontal: 15,
+        backgroundColor: '#f2f2f2', // Couleur de fond pour l'input
+
     },
     passwordInput: {
         flex: 1,
