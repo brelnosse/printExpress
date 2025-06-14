@@ -1,9 +1,7 @@
-import { createUserWithEmailAndPassword, getAuth } from '@react-native-firebase/auth';
 import { Link } from 'expo-router';
 import { useState } from 'react';
 import {
-    ActivityIndicator,
-    Image, // Ajouté pour l'indicateur de chargement
+    ActivityIndicator, // Ajouté pour l'indicateur de chargement
     KeyboardAvoidingView, // Ajouté pour une meilleure gestion du clavier
     Platform,
     ScrollView, // Ajouté pour la compatibilité
@@ -19,7 +17,7 @@ import LogoIllustration from '../components/LogoIlustration';
 import COLORS from '../constants/Colors';
 import FONTS from '../constants/Fonts';
 
-function LoginScreen() {
+function RegisterScreen() {
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -40,28 +38,28 @@ function LoginScreen() {
             return;
         }
 
-        // setIsLoading(true);
-        // setError(null);
+        setIsLoading(true);
+        setError(null);
 
-        // // Simuler un appel API
+        // Simuler un appel API
         setTimeout(() => {
-        //     createUserWithEmailAndPassword(getAuth(), 'jane.doe@example.com', 'SuperSecretPassword!')
-        //     .then(() => {
-        //         console.log('User account created & signed in!');
-        //     })
-        //     .catch(error => {
-        //         if (error.code === 'auth/email-already-in-use') {
-        //         console.log('That email address is already in use!');
-        //         }
+            // createUserWithEmailAndPassword(getAuth(), 'jane.doe@example.com', 'SuperSecretPassword!')
+            // .then(() => {
+            //     console.log('User account created & signed in!');
+            // })
+            // .catch(error => {
+            //     if (error.code === 'auth/email-already-in-use') {
+            //     console.log('That email address is already in use!');
+            //     }
 
-        //         if (error.code === 'auth/invalid-email') {
-        //         console.log('That email address is invalid!');
-        //         }
+            //     if (error.code === 'auth/invalid-email') {
+            //     console.log('That email address is invalid!');
+            //     }
 
-        //         console.error(error);
-        //     });
+            //     console.error(error);
+            // });
             // Si la connexion échoue:
-            setError("Email ou mot de passe incorrect.");
+            // setError("Email ou mot de passe incorrect.");
             setIsLoading(false);
         }, 2000);
     };
@@ -71,18 +69,42 @@ function LoginScreen() {
             style={styles.container}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-            <ScrollView style={styles.innerContainer} contentContainerStyle={{flexGrow: 1,justifyContent: 'center'}}>
+            <ScrollView style={styles.innerContainer} contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}>
                 <LogoIllustration />
-                <Text style={styles.title}>Connexion</Text>
+                <Text style={styles.title}>Insciprition</Text>
                 
                 {error && <Text style={styles.errorText}>{error}</Text>}
 
                 <View style={styles.form}>
                     <View style={styles.formGroup}>
-                        <Text style={styles.label}>Nom d&apos;utilisateur ou E-mail</Text>
+                        <Text style={styles.label}>Nom</Text>
                         <TextInput 
                             style={styles.input}
-                            placeholder="Entrez votre nom d'utilisateur ou e-mail"
+                            placeholder="Kamdoum"
+                            placeholderTextColor={COLORS.grey}
+                            onChangeText={val => handleInputChange('email', val)}
+                            value={formData.email}
+                            keyboardType="text"
+                            autoCapitalize="none"
+                        />
+                    </View>
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Prénom</Text>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder="Jessica"
+                            placeholderTextColor={COLORS.grey}
+                            onChangeText={val => handleInputChange('email', val)}
+                            value={formData.email}
+                            keyboardType="text"
+                            autoCapitalize="none"
+                        />
+                    </View>
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Adresse e-mail</Text>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder="example@domaine.com"
                             placeholderTextColor={COLORS.grey}
                             onChangeText={val => handleInputChange('email', val)}
                             value={formData.email}
@@ -90,7 +112,18 @@ function LoginScreen() {
                             autoCapitalize="none"
                         />
                     </View>
-
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Numéro de téléphone</Text>
+                        <TextInput 
+                            style={styles.input}
+                            placeholder="676 14 43 52"
+                            placeholderTextColor={COLORS.grey}
+                            onChangeText={val => handleInputChange('email', val)}
+                            value={formData.email}
+                            keyboardType="phone"
+                            autoCapitalize="none"
+                        />
+                    </View>
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Mot de passe</Text>
                         <View style={styles.passwordContainer}>
@@ -112,21 +145,11 @@ function LoginScreen() {
                         {isLoading ? (
                             <ActivityIndicator size="small" color={COLORS.white} />
                         ) : (
-                            <Text style={styles.primaryButtonText}><Icon name={"log-in-outline"} size={20} /> Se connecter</Text>
+                            <Text style={styles.primaryButtonText}><Icon name={"person-circle-outline"} size={20} /> S&apos;inscrire</Text>
                         )}
                     </TouchableOpacity>
 
-                    <View style={styles.separatorContainer}>
-                        <View style={styles.line} />
-                        <Text style={styles.separatorText}>ou</Text>
-                        <View style={styles.line} />
-                    </View>
-
-                    <TouchableOpacity style={styles.googleButton}>
-                        <Image source={require('../assets/images/logo-google.png')} style={styles.googleIcon} />
-                        <Text style={styles.googleButtonText}>Continuer avec Google</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.linkText}>Je n&apos;ai pas de compte ? <Link href={'/RegisterScreen'} style={{color: COLORS.primary}}>S&apos;inscrire</Link></Text>
+                    <Text style={styles.linkText}>J&apos;ai déjà un compte ? <Link href={'/LoginScreen'} style={{color: COLORS.primary}}>Se connecter</Link></Text>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -140,7 +163,9 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
     },
     innerContainer: {
+        flex: 1,
         paddingHorizontal: 25,
+        paddingVertical: 30
     },
     title: {
         fontSize: 34,
@@ -255,8 +280,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingVertical: '20',
         fontSize: 16,
-        fontFamily: FONTS.regular
+        fontFamily: FONTS.regular,
+        marginBottom: 30
     }
 });
 
-export default LoginScreen;
+export default RegisterScreen;

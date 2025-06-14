@@ -5,7 +5,8 @@ const COLORS = {
     grey: '#888',
     lightGrey: '#eee',
     googleBlue: '#0671eb',
-    error: '#ff3333'
+    error: '#ff3333',
+    backgroundError: '#ffe6e6'
 };
 
 export default COLORS;
