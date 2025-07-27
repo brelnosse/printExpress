@@ -6,7 +6,7 @@ export default function Layout(){
         <Stack.Screen 
             name="index"
             options={{
-                title: "Étape 1"
+                title: "Étape 1",
             }}/>
         <Stack.Screen 
             name="[stepID]" options={({route})=>({

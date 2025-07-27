@@ -1,7 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "../../components/Button";
 import DetailListItem from "../../components/DetailListItem";
@@ -9,6 +12,7 @@ import ErrorMsg from "../../components/ErrorMsg";
 import Form from "../../components/Form";
 import Input from "../../components/Input";
 import Label from "../../components/Label";
+import Loader from "../../components/Loader";
 import Password from "../../components/Password";
 import Title from "../../components/Title";
 import { COLORS } from "../../contants/colors";
@@ -18,11 +22,11 @@ import { step } from "../../utils/stepConfig";
 const check = {
     city: (city) =>{
         city = city.trim();
-        return (city.length >= 3)
+        return (city.length > 2)
     },
     institution: (institution)=>{
-        institution = institution.trim();
-        return (institution.length > 1)      
+        // institution = institution.trim();
+        return true;      
     },
     email: (email)=>{
         email = email.trim()
@@ -48,10 +52,11 @@ export default function RegisterStep(){
     const idArray = step.map((el)=> el.id);
     const insets = useSafeAreaInsets();
     const [isDisabled, setIsDisabled] = useState(true);
-
+    const [isLoading, setIsLoading] = useState(false);
     return (
-        <SafeAreaView style={{padding: 20, paddingBottom: insets.bottom}}>
-            {
+        <SafeAreaView style={{padding: 20, paddingBottom: insets.bottom, flex: 1}}>
+            {isLoading ? 
+            <Loader/> : 
                 currentStep ? 
                 (
                 <View style={{height: '100%'}}>
@@ -59,9 +64,10 @@ export default function RegisterStep(){
                     <View style={styles.buttonContainer}>
                     {idArray.includes(parseInt(currentStep.id) - 1) || parseInt(currentStep.id) === 2 ?
                     <Button 
-                        name={"Retour"} 
+                        name={<Ionicons name='arrow-back' size={20}/>} 
                         bgcolor={COLORS.backgroundWhite} 
-                        width={/*(idArray.includes(parseInt(currentStep.id) + 1) && parseInt(currentStep.id) === 2) ?*/ '45%'}
+                        horizontal={1}
+                        width={'50'}
                         onPress={()=> {
                             if(parseInt(currentStep.id) === 2){
                                 router.replace('/register')
@@ -75,19 +81,41 @@ export default function RegisterStep(){
                         name={"Suivant"} 
                         width={/*idArray.includes(currentStep.id - 1) ?*/'45%'}
                         bgcolor={isDisabled ? COLORS.btnDisabled : COLORS.primary} 
-                        horizontal={0}
+                        horizontal={1}
                         disabled = {isDisabled}
                         onPress={()=> {
                             router.replace(`/register/${currentStep.id + 1}`);
                         }}/>: 
                     <Button 
-                        name={"Terminer"} 
+                        name={<Text>Soumettre <Ionicons name='paper-plane' size={15}/></Text>} 
                         bgcolor={isDisabled ? COLORS.btnDisabled : COLORS.primary} 
                         width={/*idArray.includes(currentStep.id - 1) ?*/'45%'}
-                        horizontal={0}
-                        onPress={()=> {
-                            router.replace(`/register/${currentStep.id + 1}`);
-                        }}/>
+                        horizontal={1}
+                        onPress={
+                            async ()=> {
+                                setIsLoading(true);
+                                try{
+                                    let response =  await axios.post('http://printexpress.onlinewebshop.net/api/utilisateurs/create', formDatas, {
+                                        headers: {
+                                            'Content-Type': 'multipart/form-data'
+                                        }
+                                    });
+                                    console.log('Response:', response.data);
+                                }catch(e){
+                                    // if(e.response && e.response.data){
+                                    //     Alert.alert('Erreur'+e, e.response.data || 'Une erreur est survenue lors de l\'envoi des données.');
+                                    // }else{
+                                    //     Alert.alert('Erreur'+e, 'Une erreur est survenue lors de l\'envoi des données.');
+                                    // }
+                                    if(e.message === 'Network Error'){
+                                        Alert.alert('Pas de connexion internet', 'Vérifier votre connexion internet.');
+                                    }
+                                    console.error('Error:', e);
+                                }finally{
+                                    setIsLoading(false)
+                                }
+                            }
+                        }/>
                     }
                     </View>                
                 </View>
@@ -101,13 +129,15 @@ export default function RegisterStep(){
 function Step({id, title, child, setIsDisabled, formDatas, handleSetFormDatas}){
     const [isPasswordSecured, setIsPasswordSecured] = useState(true);
     const [isPasswordConfirmSecured, setIsPasswordConfirmSecured] = useState(true);
-    const [photoVal, setPhotoVal] = useState('Aucune photo sélèctionnée');
+    const [photoVal, setPhotoVal] = useState(formDatas.photo.trim() !== '' && formDatas.photo.split('/')[formDatas.photo.split('/').length - 1]);
+    const [docVal, setDocVal] = useState(formDatas.cni.trim() !== '' && formDatas.cni.split('/')[formDatas.cni.split('/').length - 1]);
+    
     const isDataOk = () =>{
         if(parseInt(id) === 2)
-            return !(check.city(formDatas.city) && check.institution(formDatas.institution));
+            return !(check.city(formDatas.city));
 
         if(parseInt(id) === 3)
-            return !(check.city(formDatas.email) && check.tel(formDatas.tel));
+            return !(check.email(formDatas.email) && check.tel(formDatas.tel));
 
         if(parseInt(id) === 4)
             return !(check.password(formDatas.password) && check.confirmPassword(formDatas.confirmPassword, formDatas.password))
@@ -117,7 +147,9 @@ function Step({id, title, child, setIsDisabled, formDatas, handleSetFormDatas}){
     useEffect(()=>{
         setIsDisabled(isDataOk())
     }, [formDatas])
+
     const PickImage = async () => {
+        await ImagePicker.requestCameraPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
@@ -125,8 +157,18 @@ function Step({id, title, child, setIsDisabled, formDatas, handleSetFormDatas}){
             quality: 1
         })
         if(!result.canceled){
-            let arr = result.assets[0].uri.split('/');
-            setPhotoVal(arr[arr.length-1]);
+            setPhotoVal(result.assets[0].fileName || 'Aucune photo sélèctionnée');
+            handleSetFormDatas('photo', result.assets[0].uri);
+        }
+    };
+
+    const pickDocument = async () => {
+       const result = await DocumentPicker.getDocumentAsync({
+            type: 'application/pdf',
+        })
+        if(!result.canceled){
+            setDocVal(result.assets[0].name || 'Aucun document sélèctionnée');
+            handleSetFormDatas('cni', result.assets[0].uri);
         }
     };
     return (
@@ -146,7 +188,7 @@ function Step({id, title, child, setIsDisabled, formDatas, handleSetFormDatas}){
                                     setIsDisabled(isDataOk());
                                 }}
                             />
-                            {!check[field.type === 'ville' ? 'city' : field.type](formDatas[field.type === 'ville' ? 'city' : field.type]) && <ErrorMsg>Le champ {field.type} est obligatoire.</ErrorMsg>}
+                            {!check[field.type === 'ville' ? 'city' : field.type](formDatas[field.type === 'ville' ? 'city' : field.type]) && formDatas[field.type === 'ville' ? 'city' : field.type]  && <ErrorMsg>Le champ {field.type} est obligatoire.</ErrorMsg>}
                         </View>
                     );
                 })}
@@ -178,7 +220,7 @@ function Step({id, title, child, setIsDisabled, formDatas, handleSetFormDatas}){
                 {
                     id === 5 && 
                     <>
-                        <DetailListItem text={"CNI ou récépissé (PDF)"} value={"Aucun document"}/>
+                        <DetailListItem text={"CNI ou récépissé (PDF)"} value={docVal} onPress={pickDocument}/>
                         <DetailListItem text={"Photo d'identification (images)"} value={photoVal} onPress = {PickImage}/>
                     </>
                 }
@@ -191,10 +233,9 @@ const styles = StyleSheet.create({
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
+        alignContent: 'center',
         justifyContent: 'space-between',
-        // position: 'absolute',
-        // bottom: 50
         marginTop: 'auto',
-        marginBottom: 40
+        marginBottom: 40,
     },
 });

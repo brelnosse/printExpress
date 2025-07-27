@@ -1,17 +1,17 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { Alert, StyleSheet } from "react-native";
+import { Alert, View } from "react-native";
 import Container from "../../components/Container";
 import ErrorMsg from "../../components/ErrorMsg";
 import Form from "../../components/Form";
+import Title from "../../components/Title";
 // import ImageWrapper from "../../components/ImageWrapper";
 // import Button from "../../components/Button";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
 import InputDate from "../../components/InputDate";
 import Label from "../../components/Label";
-import Title from "../../components/Title";
 import { COLORS } from "../../contants/colors";
 import { FormContext } from "../../context/FormContext";
 
@@ -97,7 +97,7 @@ export default function Register(){
                             setIsDisabled(isDataOk())
                         }
                     }/>
-                    {!check['lastname'](formDatas.lastname) && <ErrorMsg>Le champ nom est obligatoire.</ErrorMsg>}
+                    {!check['lastname'](formDatas.lastname) && formDatas.lastname && <ErrorMsg>Le champ nom est obligatoire.</ErrorMsg>}
                     
                 <Label title="Prénom"/>
                 <Input 
@@ -110,7 +110,7 @@ export default function Register(){
                             setIsDisabled(isDataOk())
                         }
                     }/>
-                    {!check['firstname'](formDatas.firstname) && <ErrorMsg>Le champ prénom &apos;st obligatoire.</ErrorMsg>}
+                    {!check['firstname'](formDatas.firstname) && formDatas.firstname && <ErrorMsg>Le champ prénom &apos;st obligatoire.</ErrorMsg>}
 
                 <Label title="Lieu de naissance"/>
                 <Input 
@@ -124,7 +124,7 @@ export default function Register(){
                         }
                     }
                 />
-                {!check['birthplace'](formDatas.birthplace) && <ErrorMsg>Le champ lieu de naissance est obligatoire.</ErrorMsg>}
+                {!check['birthplace'](formDatas.birthplace) && formDatas.birthplace&& <ErrorMsg>Le champ lieu de naissance est obligatoire.</ErrorMsg>}
                 <Label title="Date de naissance (JJ/MM/AAAA)"/>
                 <InputDate 
                     value={`${formattedDate}`} 
@@ -156,31 +156,24 @@ export default function Register(){
                         setIsDisabled(isDataOk())
                     }}
                 />}
-                {!check['birthdate'](formDatas.birthdate) && <ErrorMsg>Le champ date de naissance n&apos;st pas correctement rempli.</ErrorMsg>}
+                {!check['birthdate'](formDatas.birthdate) && formDatas.birthdate && <ErrorMsg>Le champ date de naissance n&apos;st pas correctement rempli.</ErrorMsg>}
+            </Form>
+            <View
+                style={{flex: 0.8, width: '100%', paddingBottom: 15,justifyContent: 'flex-end'}}
+            >
                 <Button 
                     disabled={isDisabled} 
                     name={"Suivant"} 
-                    // href={{
-                    //     pathname: '/register/[stepID]',
-                    //     params: {stepID: 2}
-                    // }}
                     bgcolor={isDisabled ? COLORS.btnDisabled:COLORS.primary}
                     top={15}
                     vertical={15}
                     onPress = {()=>{
-                        // if(){
-                            // console.log("ok")
-                        // }
-                        console.log(formDatas)
                         router.navigate("/register/2")
-                        // if(formDatas.lastname.trim() !== '' && formDatas.firstname.trim() !== '' && formDatas.lastname.trim() )
-                    }}
-                    />
-                {/* <Button name={"on"} bgcolor={COLORS.primary} onPress={()=> console.log(formDatas)}/> */}
-            </Form>
+                    }}/>
+            </View>            
         </Container>
     );
 }
-const styles = StyleSheet.create({
+// const styles = StyleSheet.create({
 
-})
+// })
